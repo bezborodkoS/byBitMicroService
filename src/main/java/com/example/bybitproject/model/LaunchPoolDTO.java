@@ -1,5 +1,6 @@
 package com.example.bybitproject.model;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class LaunchPoolDTO {
@@ -37,6 +38,8 @@ public class LaunchPoolDTO {
         return status;
     }
 
+
+
     @Override
     public String toString() {
         return "" +
@@ -47,4 +50,5 @@ public class LaunchPoolDTO {
                 ", status='" + status + '\''
                 ;
     }
+
 }

@@ -3,13 +3,15 @@ package com.example.bybitproject.service;
 import com.example.bybitproject.ParserLaunchPool;
 import com.example.bybitproject.model.LaunchPool;
 import com.example.bybitproject.model.LaunchPoolDTO;
+import com.example.bybitproject.model.Pool;
 import com.example.bybitproject.repository.LaunchPoolRepository;
+import com.example.bybitproject.repository.PoolRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,12 +21,14 @@ public class LaunchPoolService {
     public static final String Active = "Активний";
     private final ParserLaunchPool parserLaunchPool;
     private final LaunchPoolRepository launchPoolRepository;
+    private final PoolRepository poolRepository;
     private final LaunchPoolDBMethodsService launchPoolDBMethodsService;
 
-    public LaunchPoolService(LaunchPoolDBMethodsService launchPoolDBMethodsService, ParserLaunchPool parserLaunchPool, LaunchPoolRepository launchPoolRepository) {
+    public LaunchPoolService(LaunchPoolDBMethodsService launchPoolDBMethodsService, ParserLaunchPool parserLaunchPool, LaunchPoolRepository launchPoolRepository, PoolRepository poolRepository) {
         this.launchPoolDBMethodsService = launchPoolDBMethodsService;
         this.parserLaunchPool = parserLaunchPool;
         this.launchPoolRepository = launchPoolRepository;
+        this.poolRepository = poolRepository;
     }
 
     public boolean saveLaunchPool(String str) {
@@ -34,12 +38,12 @@ public class LaunchPoolService {
         return true;
     }
 
-    public List<LaunchPool> getLaunchPoolsActive(){
-        return launchPoolRepository.findAllByStatus(Active);
+    public List<LaunchPoolDTO> getLaunchPoolsActive(){
+        return convertLaunchPoolsToLaunchPoolDTOS(launchPoolRepository.findAllByStatus(Active));
     }
 
-    public List<LaunchPool> getLaunchPoolsStartSoon(){
-        return launchPoolRepository.findAllByStatus(START_SOON);
+    public List<LaunchPoolDTO> getLaunchPoolsStartSoon(){
+        return convertLaunchPoolsToLaunchPoolDTOS(launchPoolRepository.findAllByStatus(START_SOON));
     }
 
     public void updateLaunchPoolsInDb(){
@@ -133,6 +137,28 @@ public class LaunchPoolService {
     //    Вернуть дату в нужном формате который мы знаем в методе !!!update!!! в виде строки
     private String returnDateInNeedFormat(String date) {
         return date.substring(0, 5) + ".2024 " + date.substring(6);
+    }
+
+
+//    Преобразовывает launchPool в DTO
+    private LaunchPoolDTO convertLaunchPoolToLaunchPoolDto(LaunchPool launchPool){
+        List<Pool> poolList = poolRepository.findByLaunchPool_Id(launchPool.getId());
+        Map<String,String> poolMap = new HashMap<>();
+        for (Pool pool : poolList) {
+//                Конечная разбивка подстроки в конкретные ключ-значения
+                poolMap.put(pool.getTypePool(), pool.getPercentTypePool());
+        }
+        LaunchPoolDTO launchPoolDTO = new LaunchPoolDTO(launchPool.getExchange(), launchPool.getLaunchPool(),poolMap, launchPool.getPeriod(), launchPool.getStatus());
+        return launchPoolDTO;
+    }
+
+//    Преобразовывает List<launchPool> в List<DTO>
+    private List<LaunchPoolDTO> convertLaunchPoolsToLaunchPoolDTOS(List<LaunchPool> launchPoolList){
+        List<LaunchPoolDTO> launchPoolDTOList = new ArrayList<>();
+        for (LaunchPool launch : launchPoolList) {
+            launchPoolDTOList.add(convertLaunchPoolToLaunchPoolDto(launch));
+        }
+        return launchPoolDTOList;
     }
 
 }
