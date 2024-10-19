@@ -68,4 +68,12 @@ public class LaunchPool {
         this.status = status;
     }
 
+
+    @Override
+    public String toString() {
+        return  "</b>>" + exchange + "</b>: " + launchPool +
+                "\n period= " + period +
+                "\n status= " + status + "\n" +
+                pools.toString();
+    }
 }

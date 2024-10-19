@@ -17,17 +17,17 @@ public class AddStringLaunchPoolController {
         this.launchPoolService = launchPoolService;
     }
 
-
+//TODO раскомитить update. Отключен для проверки
     @PostMapping("/save")
     public ResponseEntity<String> saveLaunchPoolString(@RequestBody String str){
         launchPoolService.saveLaunchPool(str);
+//        launchPoolService.updateLaunchPoolsInDb();
         return new ResponseEntity<>("Save", HttpStatus.CREATED);
     }
 
     @PostMapping("/update")
     public ResponseEntity<String> updateLaunchPoolString(){
-        launchPoolService.updateNoActive();
-        launchPoolService.updateActive();
+        launchPoolService.updateLaunchPoolsInDb();
         return new ResponseEntity<>("update", HttpStatus.CREATED);
     }
 }

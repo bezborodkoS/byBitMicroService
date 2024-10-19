@@ -49,4 +49,9 @@ public class Pool {
     public void setLaunchPool(LaunchPool launchPool) {
         this.launchPool = launchPool;
     }
+
+    @Override
+    public String toString() {
+        return "</b>" + typePool + "</b>: " + percentTypePool+"\n";
+    }
 }

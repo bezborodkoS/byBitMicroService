@@ -21,6 +21,7 @@ public class LaunchPoolDBMethodsService {
         this.poolRepository = poolRepository;
     }
 
+//    Сохранение одного LaunchPool
     public boolean saveLaunchPool(LaunchPoolDTO launchPoolDTO){
 
         if (launchPoolRepository.findByExchangeAndLaunchPoolAndPeriod(launchPoolDTO.getExchange(), launchPoolDTO.getLaunchPool(), launchPoolDTO.getPeriod())==null) {
@@ -38,6 +39,7 @@ public class LaunchPoolDBMethodsService {
         return false;
     }
 
+//    сохранение листа LaunchPool
     public boolean saveLaunchPool(List<LaunchPoolDTO> launchPoolDTOList){
         for (LaunchPoolDTO launchPoolDTO: launchPoolDTOList) {
             if (launchPoolRepository.findByExchangeAndLaunchPoolAndPeriod(launchPoolDTO.getExchange(), launchPoolDTO.getLaunchPool(), launchPoolDTO.getPeriod())==null) {
@@ -49,6 +51,9 @@ public class LaunchPoolDBMethodsService {
     }
 
     public boolean deleteLaunchPool(LaunchPool launchPool){
+        for (Pool pool : poolRepository.findByLaunchPool_Id(launchPool.getId())) {
+            poolRepository.delete(pool);
+        }
         launchPoolRepository.delete(launchPool);
         System.out.println("delete "+launchPool);
         return true;

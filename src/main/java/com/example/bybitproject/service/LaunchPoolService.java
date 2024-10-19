@@ -14,6 +14,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class LaunchPoolService {
+
+    public static final String START_SOON = "Скоро почнеться";
+    public static final String Active = "Активний";
     private final ParserLaunchPool parserLaunchPool;
     private final LaunchPoolRepository launchPoolRepository;
     private final LaunchPoolDBMethodsService launchPoolDBMethodsService;
@@ -26,14 +29,26 @@ public class LaunchPoolService {
 
     public boolean saveLaunchPool(String str) {
         List<LaunchPoolDTO> launchPoolDTOList = parserLaunchPool.parsingLaunchPool(str);
-//        for (LaunchPoolDTO launchPoolDto : launchPoolDTOList) {
         launchPoolDBMethodsService.saveLaunchPool(launchPoolDTOList);
-//        }
 
         return true;
     }
 
-    public void updateNoActive() {
+    public List<LaunchPool> getLaunchPoolsActive(){
+        return launchPoolRepository.findAllByStatus(Active);
+    }
+
+    public List<LaunchPool> getLaunchPoolsStartSoon(){
+        return launchPoolRepository.findAllByStatus(START_SOON);
+    }
+
+    public void updateLaunchPoolsInDb(){
+        updateActive();
+        updateNoActive();
+    }
+
+
+    private void updateNoActive() {
 //        List<LaunchPool> launchPoolDTOListActivity = launchPoolDTOListActivity();
         SimpleDateFormat objSDF = new SimpleDateFormat("dd.mm.yyyy hh:mm");
 
@@ -54,7 +69,7 @@ public class LaunchPoolService {
 
                 if (dateStart.compareTo(dateNow) < 0) {
                     System.out.println(objSDF.format(dateStart) + " раньше чем " + objSDF.format(dateNow));
-                    launchPool.setStatus("Активний");
+                    launchPool.setStatus(Active);
                     launchPoolDBMethodsService.updateLaunchPool(launchPool);
                 }
             }
@@ -65,7 +80,7 @@ public class LaunchPoolService {
 
     }
 
-    public void updateActive() {
+    private void updateActive() {
         SimpleDateFormat objSDF = new SimpleDateFormat("dd.mm.yyyy hh:mm");
 
 
@@ -86,8 +101,7 @@ public class LaunchPoolService {
 
                 if (dateNow.compareTo(dateEnd) >0) {
                     System.out.println(objSDF.format(dateEnd) + " позже  чем " + objSDF.format(dateNow));
-                    launchPool.setStatus("Просрочено");
-                    launchPoolDBMethodsService.updateLaunchPool(launchPool);
+                    launchPoolDBMethodsService.deleteLaunchPool(launchPool);
                 }
             }
 
